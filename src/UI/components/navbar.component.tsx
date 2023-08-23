@@ -24,7 +24,7 @@ export const NavBar = ({ drawerWidth }: NavBarProps) => {
           <MenuOutlined />
         </IconButton>
         <Grid container direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant='h6' noWrap component='div'> Journal Dream App</Typography>
+          <Typography variant='h6' noWrap component='div'> Journal Dream App </Typography>
 
           <IconButton color='error'>
             <LogoutOutlined />
