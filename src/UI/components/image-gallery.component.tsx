@@ -1,11 +1,9 @@
-
 import Box from '@mui/material/Box';
-import {ImageList, ImageListItem}from '@mui/material';
-
+import { ImageList, ImageListItem } from '@mui/material';
 
 export const ImageGallery = () => {
   return (
-    <Box sx={{ width: "100%", height: 450, overflowY: 'scroll' }}>
+    <Box sx={{ width: '100%', height: 450, overflowY: 'scroll' }}>
       <ImageList variant="masonry" cols={5} gap={8}>
         {itemData.map((item) => (
           <ImageListItem key={item.img}>
@@ -20,7 +18,7 @@ export const ImageGallery = () => {
       </ImageList>
     </Box>
   );
-}
+};
 
 const itemData = [
   {
@@ -72,6 +70,3 @@ const itemData = [
     title: 'Coffee table',
   },
 ];
-
-
-
