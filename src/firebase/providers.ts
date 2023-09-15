@@ -1,23 +1,8 @@
-import { GoogleAuthProvider, OAuthCredential, signInWithPopup } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { fbAuth } from './config';
 import { FirebaseError } from 'firebase/app';
 import { getErrorMessage } from 'src/utilities/error';
-
-interface ResultSignInGoogle {
-  ok: true;
-  displayName: string | null;
-  email: string | null;
-  photoURL: string | null;
-  uid: string;
-}
-
-interface ErrorSignInGoogle {
-  ok: false;
-  errorMessage: string;
-  errorCode?: string;
-  email?: unknown;
-  credential?: OAuthCredential | null;
-}
+import { ErrorSignInGoogle, ResultSignInGoogle } from './interfaces';
 
 const googleProvider = new GoogleAuthProvider();
 export const signInWithGoogle = async (): Promise<ResultSignInGoogle | ErrorSignInGoogle> => {

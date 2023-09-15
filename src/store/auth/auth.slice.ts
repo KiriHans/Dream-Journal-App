@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { IAuthSliceState } from '../interfaces';
+import { ResultSignInGoogle } from 'src/firebase/interfaces';
 
 const authSliceName = 'auth';
 const initialState: IAuthSliceState = {
@@ -15,14 +16,14 @@ const authSlice = createSlice({
   name: authSliceName,
   initialState,
   reducers: {
-    login: (state, { payload }) => {
-      {
-        state;
-        payload;
-      }
+    login: (state, { payload }: PayloadAction<ResultSignInGoogle>) => {
+      const { displayName, email, photoURL, uid } = payload;
+      state = { displayName, email, photoURL, uid, status: 'authenticated', error: null };
+      return state;
     },
     logout: (state, { payload }: PayloadAction<{ errorMessage: string }>) => {
       state = { ...initialState, error: payload.errorMessage };
+      return state;
     },
     checkingCredentials: (state) => {
       state.status = 'checking';
