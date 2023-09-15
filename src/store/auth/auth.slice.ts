@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { IAuthSliceState } from '../interfaces';
 
 const authSliceName = 'auth';
@@ -21,11 +21,8 @@ const authSlice = createSlice({
         payload;
       }
     },
-    logout: (state, { payload }) => {
-      {
-        state;
-        payload;
-      }
+    logout: (state, { payload }: PayloadAction<{ errorMessage: string }>) => {
+      state = { ...initialState, error: payload.errorMessage };
     },
     checkingCredentials: (state) => {
       state.status = 'checking';

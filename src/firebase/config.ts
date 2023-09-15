@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -24,8 +25,8 @@ const firebaseConfig = {
 // Initialize Firebase
 
 const fbApp = initializeApp(firebaseConfig);
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const auth = getAuth(fbApp);
+export const fbAuth = getAuth(fbApp);
+export const firestore = getFirestore(fbApp);
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const analytics = getAnalytics(fbApp);

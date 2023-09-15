@@ -6,5 +6,5 @@ export interface IAuthSliceState {
   displayName: string;
   photoURL: null | string;
   status: StatusAuth;
-  error: null;
+  error: null | string;
 }

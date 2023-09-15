@@ -1,6 +1,7 @@
 import { PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 import { checkingCredentials } from '.';
 import { RootState } from '../store';
+import { signInWithGoogle } from 'src/firebase/providers';
 
 export const checkingAuthentication = (
   email: string,
@@ -17,6 +18,7 @@ export const checkingAuthentication = (
 
 export const startGoogleSignIn = (): ThunkAction<void, RootState, unknown, PayloadAction<void>> => {
   return async function () {
-    console.log('start');
+    const result = await signInWithGoogle();
+    console.log(result);
   };
 };
