@@ -5,8 +5,11 @@ import { AuthLayout } from '../layout/auth.layout';
 import { IFormLogin } from '../interfaces';
 import { useForm } from 'src/hooks';
 import { ChangeEvent } from 'react';
+import { useAppDispatch } from 'src/hooks/useAppDispatch';
+import { checkingAuthentication, startGoogleSignIn } from 'src/store/auth';
 
 export const LoginPage = () => {
+  const dispatch = useAppDispatch();
   const formLogin: IFormLogin = {
     email: 'email@exaple.com',
     password: '********',
@@ -17,7 +20,11 @@ export const LoginPage = () => {
   const onSubmit = (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    console.log({ email, password });
+    dispatch(checkingAuthentication(email, password));
+  };
+
+  const onGoogleSignIn = () => {
+    dispatch(startGoogleSignIn());
   };
 
   return (
@@ -55,7 +62,7 @@ export const LoginPage = () => {
               </Button>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Button variant="contained" fullWidth>
+              <Button onClick={onGoogleSignIn} variant="contained" fullWidth>
                 <Google />
                 <Typography sx={{ ml: 1 }}>Google</Typography>
               </Button>

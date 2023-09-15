@@ -1,15 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { IAuthSliceState } from '../interfaces';
+
+const authSliceName = 'auth';
+const initialState: IAuthSliceState = {
+  uid: null,
+  email: null,
+  displayName: 'Guest',
+  photoURL: null,
+  status: 'non-authenticated',
+  error: null,
+};
 
 const authSlice = createSlice({
-  name: 'auth',
-  initialState: {
-    uid: null,
-    email: null,
-    displayName: 'Guest',
-    photoURL: null,
-    error: null,
-    loading: false,
-  },
+  name: authSliceName,
+  initialState,
   reducers: {
     login: (state, { payload }) => {
       {
@@ -23,8 +27,11 @@ const authSlice = createSlice({
         payload;
       }
     },
+    checkingCredentials: (state) => {
+      state.status = 'checking';
+    },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout, checkingCredentials } = authSlice.actions;
 export const authReducer = authSlice.reducer;
