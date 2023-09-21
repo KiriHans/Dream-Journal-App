@@ -3,30 +3,40 @@ import { Button, Grid, TextField, Typography, Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { AuthLayout } from '../layout/auth.layout';
 import { IFormLogin } from '../interfaces';
-import { useForm } from 'src/hooks';
+import { IFormValidation, useForm } from 'src/hooks';
 import { ChangeEvent, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
 import { checkingAuthentication, startGoogleSignIn } from 'src/store/auth';
+import { emailValidator, minimumLengthValidator } from 'src/utilities/validators';
 
 export const LoginPage = () => {
   const { status } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const formLogin: IFormLogin = {
-    email: 'email@exaple.com',
+    email: 'email@example.com',
     password: '********',
   };
+  const formValidations: IFormValidation = {
+    email: [emailValidator, 'Email is invalid'],
+    password: [minimumLengthValidator(6), 'Email is invalid'],
+  };
 
-  const { email, password, onInputChange } = useForm(formLogin);
+  const { email, password, validations, onInputChange } = useForm(formLogin, formValidations);
+  const { isFormValid, checkedValidation } = validations;
+  console.log(isFormValid);
 
   const isAuthenticating = useMemo(() => status === 'checking', [status]);
 
   const onSubmit = (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isAuthenticating) return;
 
     dispatch(checkingAuthentication(email, password));
   };
 
   const onGoogleSignIn = () => {
+    if (isAuthenticating) return;
+
     dispatch(startGoogleSignIn());
   };
 
@@ -42,6 +52,8 @@ export const LoginPage = () => {
               onChange={onInputChange}
               placeholder={formLogin.email}
               value={email}
+              error={!!checkedValidation[`emailValid`]}
+              helperText={checkedValidation[`emailValid`]}
               fullWidth
             />
           </Grid>
@@ -54,6 +66,8 @@ export const LoginPage = () => {
               onChange={onInputChange}
               placeholder={formLogin.password}
               value={password}
+              error={!!checkedValidation[`passwordValid`]}
+              helperText={checkedValidation[`passwordValid`]}
               fullWidth
             />
           </Grid>

@@ -1,5 +1,5 @@
 export interface IFormRegister {
-  fullName: string;
+  displayName: string;
   email: string;
   password: string;
 }
