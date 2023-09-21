@@ -18,7 +18,7 @@ export const LoginPage = () => {
   };
   const formValidations: IFormValidation = {
     email: [emailValidator, 'Email is invalid'],
-    password: [minimumLengthValidator(6), 'Email is invalid'],
+    password: [minimumLengthValidator(6), 'Password is invalid'],
   };
 
   const { email, password, validations, onInputChange } = useForm(formLogin, formValidations);

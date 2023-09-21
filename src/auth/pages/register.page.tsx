@@ -23,7 +23,7 @@ export const RegisterPage = () => {
   const formValidations: IFormValidation = {
     displayName: [minimumLengthValidator(1), 'Name is required'],
     email: [emailValidator, 'Email is invalid'],
-    password: [minimumLengthValidator(6), 'Email is invalid'],
+    password: [minimumLengthValidator(6), 'Password is invalid'],
   };
   const { displayName, email, password, validations, onInputChange } = useForm(
     formRegister,
