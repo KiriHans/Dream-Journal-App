@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { FirebaseOptions, initializeApp } from 'firebase/app';
 
 import { getAnalytics } from 'firebase/analytics';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
@@ -11,7 +11,7 @@ const locationHostname = function (hostname: string): { isDev: boolean; hostname
 
 const { isDev, hostname } = locationHostname(location.hostname);
 
-const firebaseConfig = isDev
+const firebaseConfig: FirebaseOptions = isDev
   ? {
       apiKey: 'AIzaSyBadHKqQlE6PgNs1n7XJaVP9oRONpc4Z50',
       authDomain: 'demo-project-1234.firebaseapp.com',

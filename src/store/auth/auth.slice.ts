@@ -8,7 +8,7 @@ const initialState: IAuthSliceState = {
   email: null,
   displayName: 'Guest',
   photoURL: null,
-  status: 'non-authenticated',
+  status: 'checking',
   error: null,
 };
 
@@ -21,8 +21,8 @@ const authSlice = createSlice({
       state = { displayName, email, photoURL, uid, status: 'authenticated', error: null };
       return state;
     },
-    logout: (state, { payload }: PayloadAction<{ errorMessage: string }>) => {
-      state = { ...initialState, error: payload.errorMessage };
+    logout: (state, { payload }: PayloadAction<{ errorMessage?: string }>) => {
+      state = { ...initialState, status: 'non-authenticated', error: payload.errorMessage ?? null };
       return state;
     },
     checkingCredentials: (state) => {

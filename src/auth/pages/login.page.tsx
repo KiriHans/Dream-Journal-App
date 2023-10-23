@@ -1,16 +1,16 @@
 import { Google } from '@mui/icons-material';
-import { Button, Grid, TextField, Typography, Link } from '@mui/material';
+import { Button, Grid, TextField, Typography, Link, Alert } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { AuthLayout } from '../layout/auth.layout';
 import { IFormLogin } from '../interfaces';
 import { IFormValidation, useForm } from 'src/hooks';
 import { ChangeEvent, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
-import { checkingAuthentication, startGoogleSignIn } from 'src/store/auth';
+import { startGoogleSignIn, startLoginUserWithEmailPassword } from 'src/store/auth';
 import { emailValidator, minimumLengthValidator } from 'src/utilities/validators';
 
 export const LoginPage = () => {
-  const { status } = useAppSelector((state) => state.auth);
+  const { status, error } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const formLogin: IFormLogin = {
     email: 'email@example.com',
@@ -23,15 +23,14 @@ export const LoginPage = () => {
 
   const { email, password, validations, onInputChange } = useForm(formLogin, formValidations);
   const { isFormValid, checkedValidation } = validations;
-  console.log(isFormValid);
 
   const isAuthenticating = useMemo(() => status === 'checking', [status]);
 
   const onSubmit = (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isAuthenticating) return;
+    if (isAuthenticating && !isFormValid) return;
 
-    dispatch(checkingAuthentication(email, password));
+    dispatch(startLoginUserWithEmailPassword({ email, password }));
   };
 
   const onGoogleSignIn = () => {
@@ -73,6 +72,9 @@ export const LoginPage = () => {
           </Grid>
 
           <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
+            <Grid item xs={12} alignItems="center" display={error ? '' : 'none'}>
+              <Alert severity="error">{error}</Alert>
+            </Grid>
             <Grid item xs={12} sm={6}>
               <Button disabled={isAuthenticating} type="submit" variant="contained" fullWidth>
                 Login

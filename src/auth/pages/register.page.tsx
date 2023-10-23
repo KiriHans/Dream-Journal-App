@@ -1,18 +1,23 @@
-import { Button, Grid, Link, TextField, Typography } from '@mui/material';
+import { Alert, Button, Grid, Link, TextField, Typography } from '@mui/material';
 import { AuthLayout } from '../layout/auth.layout';
 import { Link as RouterLink } from 'react-router-dom';
 import { IFormRegister } from '../interfaces';
 import { IFormValidation, useForm } from 'src/hooks';
-import { useAppSelector } from 'src/hooks/useAppDispatch';
-import { ChangeEvent, useMemo } from 'react';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
+import { ChangeEvent, useMemo, useState } from 'react';
 import { emailValidator, minimumLengthValidator } from 'src/utilities/validators';
+import { startRegisterUserWithEmailPassword } from 'src/store/auth';
 
 export interface Test {
   [key: string]: string;
 }
 
 export const RegisterPage = () => {
-  const { status } = useAppSelector((state) => state.auth);
+  const { status, error } = useAppSelector((state) => state.auth);
+  const isCheckingAuth = useMemo(() => status === 'checking', [status]);
+
+  const dispatch = useAppDispatch();
+  const [formSubmitted, setformSubmitted] = useState(false);
 
   const formRegister: IFormRegister = {
     displayName: 'John Doe',
@@ -29,16 +34,18 @@ export const RegisterPage = () => {
     formRegister,
     formValidations
   );
+
   const { isFormValid, checkedValidation } = validations;
-  console.log(isFormValid);
 
   const isAuthenticating = useMemo(() => status === 'checking', [status]);
 
   const onSubmit = (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isAuthenticating) return;
+    if (isAuthenticating && !isFormValid) return;
 
-    // dispatch(checkingAuthentication(email, password));
+    setformSubmitted(true);
+
+    dispatch(startRegisterUserWithEmailPassword({ displayName, email, password }));
   };
 
   return (
@@ -53,7 +60,7 @@ export const RegisterPage = () => {
               onChange={onInputChange}
               placeholder={formRegister.displayName}
               value={displayName}
-              error={!!checkedValidation[`displayNameValid`]}
+              error={!!checkedValidation[`displayNameValid`] && formSubmitted}
               helperText={checkedValidation[`displayNameValid`]}
               fullWidth
             ></TextField>
@@ -67,7 +74,7 @@ export const RegisterPage = () => {
               onChange={onInputChange}
               placeholder={formRegister.email}
               value={email}
-              error={!!checkedValidation[`emailValid`]}
+              error={!!checkedValidation[`emailValid`] && formSubmitted}
               helperText={checkedValidation[`emailValid`]}
               fullWidth
             ></TextField>
@@ -81,15 +88,18 @@ export const RegisterPage = () => {
               onChange={onInputChange}
               placeholder={formRegister.password}
               value={password}
-              error={!!checkedValidation[`passwordValid`]}
+              error={!!checkedValidation[`passwordValid`] && formSubmitted}
               helperText={checkedValidation[`passwordValid`]}
               fullWidth
             ></TextField>
           </Grid>
 
           <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
+            <Grid item xs={12} alignItems="center" display={error ? '' : 'none'}>
+              <Alert severity="error">{error}</Alert>
+            </Grid>
             <Grid item xs={12} alignItems="center">
-              <Button type="submit" variant="contained" fullWidth>
+              <Button disabled={isCheckingAuth} type="submit" variant="contained" fullWidth>
                 Sign up
               </Button>
             </Grid>

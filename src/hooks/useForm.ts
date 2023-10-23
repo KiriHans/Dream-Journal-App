@@ -24,7 +24,8 @@ export const useForm = <T extends Record<keyof T, string>>(
 
   useEffect(() => {
     createValidator();
-  }, [formState, createValidator]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState]);
 
   return {
     ...formState,
