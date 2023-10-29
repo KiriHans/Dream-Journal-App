@@ -8,7 +8,7 @@ const initialState: IAuthSliceState = {
   email: null,
   displayName: 'Guest',
   photoURL: null,
-  status: 'checking',
+  status: 'non-authenticated',
   error: null,
 };
 

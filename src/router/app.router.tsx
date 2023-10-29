@@ -3,11 +3,12 @@ import { AuthRoutes } from '../auth/routes/Auth.routes';
 import { JournalRoutes } from '../journal/routes/Journal.routes';
 import { CheckingAuth } from 'src/UI/components';
 import { useCheckAuth } from 'src/hooks';
+import {} from 'react-firebase-hooks/auth';
 
 const AppRouter = () => {
-  const { status } = useCheckAuth();
+  const { status, loading } = useCheckAuth();
 
-  return status === 'checking' ? (
+  return loading ? (
     <CheckingAuth />
   ) : (
     <Routes>

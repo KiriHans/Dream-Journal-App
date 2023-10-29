@@ -50,9 +50,16 @@ export const RegisterPage = () => {
 
   return (
     <AuthLayout title="Sign Up">
-      <form onSubmit={onSubmit}>
+      <form
+        onSubmit={onSubmit}
+        className="normality animate__animated animate__fadeIn animate__faster"
+      >
         <Grid container>
-          <Grid item xs={12} sx={{ mt: 2 }}>
+          <Grid
+            item
+            xs={12}
+            sx={{ mt: 2, animation: '3s ease-in 1s 2 reverse both paused slidein' }}
+          >
             <TextField
               label="Full name"
               name="displayName"

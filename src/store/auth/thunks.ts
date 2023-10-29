@@ -3,6 +3,7 @@ import { checkingCredentials, login, logout } from '.';
 import { RootState } from '../store';
 import {
   loginWithEmailPassword,
+  logoutFirebase,
   registerUserWithEmail,
   signInWithGoogle,
 } from 'src/firebase/providers';
@@ -21,12 +22,6 @@ export const checkingAuthentication = (
     dispatch(checkingCredentials());
   };
 };
-
-// export const startGoogleSignIn = createAsyncThunk<{disp}>('auth', async (dispatch) => {
-//   const result = await signInWithGoogle();
-
-//   return result;
-// });
 
 export const startGoogleSignIn = (): ThunkAction<
   void,
@@ -91,5 +86,18 @@ export const startLoginUserWithEmailPassword = ({
     }
 
     dispatch(login(result));
+  };
+};
+
+export const startLogout = (): ThunkAction<
+  void,
+  RootState,
+  unknown,
+  PayloadAction<{ errorMessage?: string }>
+> => {
+  return async (dispatch) => {
+    await logoutFirebase();
+
+    dispatch(logout({}));
   };
 };

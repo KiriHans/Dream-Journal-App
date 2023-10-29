@@ -1,21 +1,22 @@
-import { onAuthStateChanged } from 'firebase/auth';
-import { useEffect } from 'react';
+import { User } from 'firebase/auth';
 import { fbAuth } from 'src/firebase/config';
-import { logout, login } from 'src/store/auth';
+import { login } from 'src/store/auth';
 import { useAppSelector, useAppDispatch } from './useAppDispatch';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export const useCheckAuth = () => {
   const { status } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
+  const onUserChanged = async (user: User | null) => {
+    if (!user) {
+      return;
+    }
 
-  useEffect(() => {
-    onAuthStateChanged(fbAuth, async (user) => {
-      if (!user) return dispatch(logout({}));
-      const { uid, email, displayName, photoURL } = user;
-      return dispatch(login({ ok: true, uid, email, displayName, photoURL }));
-    });
-    console.log('init');
-  }, []);
+    const { uid, email, displayName, photoURL } = user;
+    dispatch(login({ ok: true, uid, email, displayName, photoURL }));
+  };
 
-  return { status };
+  const [user, loading, error] = useAuthState(fbAuth, { onUserChanged });
+
+  return { status, user, loading, error };
 };

@@ -1,22 +1,21 @@
-import { Divider, Grid, Typography, keyframes } from '@mui/material';
+import { Divider, Grid, Typography } from '@mui/material';
 
 type AuthLayoutProps = {
   children: React.ReactNode;
   title: string;
 };
 
-const backgroundImage =
-  'https://images.unsplash.com/photo-1608178398319-48f814d0750c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=248&fit=crop&auto=format';
-const backgroundKeyframes = keyframes`
-    0%{transform: scale(1);}
-    50%{transform: scale(1.1);}
-    100%{scale(1);}
-`;
+// const backgroundImage =
+//   'https://images.unsplash.com/photo-1608178398319-48f814d0750c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=248&fit=crop&auto=format';
+// const backgroundKeyframes = keyframes`
+//     0%{transform: scale(1);}
+//     50%{transform: scale(1.1);}
+//     100%{scale(1);}
+// `;
 
 export const AuthLayout = ({ children, title = '' }: AuthLayoutProps) => {
   return (
     <Grid
-      className="normality"
       container
       spacing={0}
       direction="column"

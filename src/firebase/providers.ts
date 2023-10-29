@@ -122,3 +122,7 @@ export const loginWithEmailPassword = async ({
     };
   }
 };
+
+export const logoutFirebase = async () => {
+  return await fbAuth.signOut();
+};
