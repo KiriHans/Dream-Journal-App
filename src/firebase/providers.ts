@@ -55,6 +55,7 @@ export const registerUserWithEmail = async ({
 }: IFormRegister): Promise<ResultSignInGoogle | ErrorSignInGoogle> => {
   try {
     const response = await createUserWithEmailAndPassword(fbAuth, email, password);
+
     const { uid, photoURL } = response.user;
     await updateProfile(response.user, { displayName });
 

@@ -5,8 +5,12 @@ export const minimumLengthValidator = (minLength: number): ((value: string) => b
   return (value: string) => value.length >= minLength;
 };
 
-export const emailValidator = (value: string): boolean => {
-  // if (value.length === 0) return true;
+export const maximumLengthValidator = (maxLength: number): ((value: string) => boolean) => {
+  return (value: string) => value.length <= maxLength;
+};
 
+export const notEmpty = (value: string) => value.length !== 0;
+
+export const emailValidator = (value: string): boolean => {
   return EMAIL_REGEXP.test(value);
 };

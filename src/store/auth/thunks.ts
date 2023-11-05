@@ -34,6 +34,7 @@ export const startGoogleSignIn = (): ThunkAction<
 
     const result = await signInWithGoogle();
     if (!result.ok) {
+      console.log('asds');
       const errorMessage = result.errorMessage;
       return dispatch(logout({ errorMessage }));
     }

@@ -1,18 +1,6 @@
-import { TurnedInNot } from '@mui/icons-material';
-import {
-  Box,
-  Divider,
-  Drawer,
-  Grid,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { Box, Divider, Drawer, List, Toolbar, Typography } from '@mui/material';
 import { useAppSelector } from 'src/hooks/useAppDispatch';
+import { SidebarItem } from '.';
 
 type SideBarProps = {
   drawerWidth: number;
@@ -20,6 +8,7 @@ type SideBarProps = {
 
 export const SideBar = ({ drawerWidth }: SideBarProps) => {
   const { displayName } = useAppSelector((state) => state.auth);
+  const { notes } = useAppSelector((state) => state.journal);
 
   return (
     <Box
@@ -46,20 +35,8 @@ export const SideBar = ({ drawerWidth }: SideBarProps) => {
         <Divider />
 
         <List>
-          {['January', 'February', 'March', 'April'].map((text) => (
-            <ListItem key={text} disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <TurnedInNot />
-                </ListItemIcon>
-                <Grid container>
-                  <ListItemText primary={text} />
-                  <ListItemText
-                    secondary={'This is a text full of details that you have to understand'}
-                  />
-                </Grid>
-              </ListItemButton>
-            </ListItem>
+          {notes.map((note) => (
+            <SidebarItem key={note.id} note={note} />
           ))}
         </List>
       </Drawer>
