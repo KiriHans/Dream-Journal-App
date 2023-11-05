@@ -3,6 +3,7 @@ import { FirebaseOptions, initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
+import { connectStorageEmulator, getStorage } from 'firebase/storage';
 
 // https://firebase.google.com/docs/web/setup#available-libraries
 const locationHostname = function (hostname: string): { isDev: boolean; hostname: string } {
@@ -36,11 +37,13 @@ const firebaseConfig: FirebaseOptions = isDev
 const fbApp = initializeApp(firebaseConfig);
 export const fbAuth = getAuth(fbApp);
 export const firestore = getFirestore(fbApp);
+export const fbStorage = getStorage(fbApp);
 
 if (isDev) {
   console.log(`${hostname} detected!`);
   connectAuthEmulator(fbAuth, 'http://127.0.0.1:9099');
   connectFirestoreEmulator(firestore, '127.0.0.1', 8080);
+  connectStorageEmulator(fbStorage, '127.0.0.1', 9199);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

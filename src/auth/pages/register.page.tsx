@@ -21,7 +21,7 @@ export const RegisterPage = () => {
 
   const formRegister: IFormRegister = {
     displayName: 'John Doe',
-    email: 'email@exaple.com',
+    email: 'email@example.com',
     password: '********',
   };
 

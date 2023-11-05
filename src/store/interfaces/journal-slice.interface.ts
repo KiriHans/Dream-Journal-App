@@ -3,7 +3,7 @@ export interface IActive {
   title: string;
   body: string;
   date: number;
-  imagesUrls?: string[];
+  imagesUrls: IImagesUrls[];
 }
 
 export interface INote {
@@ -11,6 +11,7 @@ export interface INote {
   title: string;
   body: string;
   date: number;
+  imagesUrls: IImagesUrls[];
 }
 
 export interface IJournalSliceState {
@@ -18,4 +19,9 @@ export interface IJournalSliceState {
   messageSaved: string;
   notes: INote[];
   active: IActive | null;
+}
+
+export interface IImagesUrls {
+  name: string;
+  url: string;
 }

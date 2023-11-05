@@ -3,7 +3,7 @@ import { IFormValidation, useValidation } from '.';
 
 export const useForm = <T extends Record<keyof T, string>>(
   initialForm: T,
-  formValidations: IFormValidation
+  formValidations?: IFormValidation
 ) => {
   const [formState, setFormState] = useState(initialForm);
   const { isFormValid, checkedValidation, createValidator } = useValidation<T>(

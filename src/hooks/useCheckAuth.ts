@@ -3,6 +3,7 @@ import { fbAuth } from 'src/firebase/config';
 import { login } from 'src/store/auth';
 import { useAppSelector, useAppDispatch } from './useAppDispatch';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { startLoadingNotes } from 'src/store/journal';
 
 export const useCheckAuth = () => {
   const { status } = useAppSelector((state) => state.auth);
@@ -14,6 +15,7 @@ export const useCheckAuth = () => {
 
     const { uid, email, displayName, photoURL } = user;
     dispatch(login({ ok: true, uid, email, displayName, photoURL }));
+    dispatch(startLoadingNotes());
   };
 
   const [user, loading, error] = useAuthState(fbAuth, { onUserChanged });

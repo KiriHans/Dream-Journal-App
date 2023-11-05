@@ -10,7 +10,7 @@ interface CheckedValidation {
 
 export const useValidation = <T extends Record<keyof T, string>>(
   formState: T,
-  formValidations: IFormValidation
+  formValidations?: IFormValidation
 ) => {
   const [checkedValidation, setCheckedValidation] = useState<CheckedValidation>({});
 
@@ -24,7 +24,7 @@ export const useValidation = <T extends Record<keyof T, string>>(
   const createValidator = () => {
     const formCheckedValues: CheckedValidation = {};
     for (const formField of Object.keys(formState)) {
-      const [fn, errorMessage] = formValidations[formField];
+      const [fn, errorMessage] = formValidations?.[formField] ?? [() => true, ''];
       formCheckedValues[`${formField}Valid`] = fn(formState[formField as keyof T])
         ? null
         : errorMessage;

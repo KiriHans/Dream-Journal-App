@@ -4,14 +4,16 @@ import { NoteDbModel } from './interfaces/journal.interface';
 
 export const noteConverter: FirestoreDataConverter<INote, NoteDbModel> = {
   toFirestore: (note: INote): NoteDbModel => {
+    const noteToFirebase = { ...note };
+    delete noteToFirebase.id;
     return {
-      ...note,
+      ...noteToFirebase,
       date: Timestamp.fromMillis(note.date),
     };
   },
   fromFirestore: (snapshot, options) => {
     const note = snapshot.data(options) as NoteDbModel;
 
-    return { ...note, date: note.date.toMillis() };
+    return { ...note, date: note.date.toMillis(), id: snapshot.id };
   },
 };
