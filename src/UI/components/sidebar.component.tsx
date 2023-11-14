@@ -1,14 +1,15 @@
 import { Box, Divider, Drawer, List, Toolbar, Typography } from '@mui/material';
 import { useAppSelector } from 'src/hooks/useAppDispatch';
 import { SidebarItem } from '.';
+import { SelectNotesSorted, selectAuth } from 'src/store/journal';
 
 type SideBarProps = {
   drawerWidth: number;
 };
 
 export const SideBar = ({ drawerWidth }: SideBarProps) => {
-  const { displayName } = useAppSelector((state) => state.auth);
-  const { notes } = useAppSelector((state) => state.journal);
+  const { displayName } = useAppSelector(selectAuth);
+  const notes = useAppSelector(SelectNotesSorted);
 
   return (
     <Box

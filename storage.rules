@@ -5,8 +5,37 @@ rules_version = '2';
 //    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if true;
+
+
+    match /images/{userId} {
+      allow read: if belongsTo(userId);
+      allow delete: if isLoggedIn() && belongsTo(userId);
+
+
+      match /{nameImage} {
+        allow read;
+
+        allow create, update: if belongsTo(userId) && allowedImage(userId, nameImage);
+
+        allow delete: if isLoggedIn() && belongsTo(userId);
+
+      }
     }
+
+    function isLoggedIn() {
+      return request.auth.uid != null;
+    }
+
+    function belongsTo(userId) {
+      return request.auth.uid == userId; 
+    }
+
+    function allowedImage(userId, nameImage) {
+      let isImage = request.resource.contentType.matches('image/.*');
+      let isSmallImage = request.resource.size < 1 * 1024 * 1024;
+      return isImage && isSmallImage  ; 
+    }
+
+
   }
 }

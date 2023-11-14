@@ -8,20 +8,26 @@ import {
   deleteNoteById,
   savingNewNote,
   setActiveNote,
+  setError,
   setNotes,
   setPhotosToActiveNote,
   setSaving,
   updateNote,
 } from '.';
 import { noteConverter } from 'src/firebase/converters';
-import { fileUpload, loadNotes } from 'src/helpers';
+import { fileDelete, fileUpload, loadNotes } from 'src/helpers';
 import { StorageError, UploadTaskSnapshot, getDownloadURL } from 'firebase/storage';
+import { FirebaseError } from 'firebase/app';
 
-export const startNewNote = (): ThunkAction<
+export const startNewNote = ({
+  title,
+}: {
+  title: string;
+}): ThunkAction<
   void,
   RootState,
   unknown,
-  PayloadAction<INote | void>
+  PayloadAction<INote | { errorMessage: string } | void>
 > => {
   return async (dispatch, getState) => {
     dispatch(savingNewNote());
@@ -29,15 +35,23 @@ export const startNewNote = (): ThunkAction<
     const journalRef = collection(firestore, `users/${uid}/journal`).withConverter(noteConverter);
 
     const newNote: INote = {
-      title: '',
+      title,
       body: '',
       date: Timestamp.now().toMillis(),
       id: '',
       imagesUrls: [],
     };
 
-    const docRef = await addDoc(journalRef, newNote);
-    newNote.id = docRef.id;
+    try {
+      const docRef = await addDoc(journalRef, newNote);
+      newNote.id = docRef.id;
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        console.error(error);
+        const errorMessage = error.message;
+        return dispatch(setError({ errorMessage }));
+      }
+    }
 
     dispatch(addNewEmptyNote(newNote));
     dispatch(setActiveNote(newNote));
@@ -62,7 +76,7 @@ export const startSaveNote = (): ThunkAction<
   void,
   RootState,
   unknown,
-  PayloadAction<void | IActive | null>
+  PayloadAction<void | IActive | { errorMessage: string } | null>
 > => {
   return async (dispatch, getState) => {
     const { uid } = getState().auth;
@@ -75,7 +89,16 @@ export const startSaveNote = (): ThunkAction<
     const docRef = doc(firestore, `users/${uid}/journal/${activeNote?.id}`).withConverter(
       noteConverter
     );
-    await setDoc(docRef, updatedNote, { merge: true });
+
+    try {
+      await setDoc(docRef, updatedNote, { merge: true });
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        console.error(error);
+        const errorMessage = error.message;
+        return dispatch(setError({ errorMessage }));
+      }
+    }
 
     dispatch(updateNote(updatedNote));
   };
@@ -83,13 +106,29 @@ export const startSaveNote = (): ThunkAction<
 
 export const startUploadingFiles = (
   files: FileList
-): ThunkAction<void, RootState, unknown, PayloadAction<void | IActive | IImagesUrls[]>> => {
-  return async (dispatch) => {
+): ThunkAction<
+  void,
+  RootState,
+  unknown,
+  PayloadAction<void | IActive | IImagesUrls[] | { errorMessage: string }>
+> => {
+  return async (dispatch, getState) => {
+    const { uid } = getState().auth;
+    const { active } = getState().journal;
+
+    if (!uid || !active) return;
+
     const fileUploadPromises = [];
     let uploadTasksArray: UploadTaskSnapshot[] = [];
 
+    if (files.length + active.imagesUrls.length > 10) {
+      return dispatch(
+        setError({ errorMessage: 'Limit exceeded: You can only have 10 images per note.' })
+      );
+    }
+
     for (const file of files) {
-      fileUploadPromises.push(fileUpload(file));
+      fileUploadPromises.push(fileUpload(file, uid));
     }
 
     try {
@@ -97,16 +136,27 @@ export const startUploadingFiles = (
     } catch (error) {
       if (error instanceof StorageError) {
         console.error(error);
+        const errorMessage = error.message;
+        return dispatch(setError({ errorMessage }));
       }
     }
 
     const photoUrls: IImagesUrls[] = [];
 
     for (const uploadTask of uploadTasksArray) {
-      photoUrls.push({
-        name: uploadTask.metadata.name,
-        url: await getDownloadURL(uploadTask.ref),
-      });
+      try {
+        const url = await getDownloadURL(uploadTask.ref);
+        photoUrls.push({
+          name: uploadTask.metadata.name,
+          url,
+        });
+      } catch (error) {
+        if (error instanceof StorageError) {
+          console.error(error);
+          const errorMessage = error.message;
+          return dispatch(setError({ errorMessage }));
+        }
+      }
     }
 
     dispatch(setPhotosToActiveNote(photoUrls));
@@ -118,15 +168,33 @@ export const startDeletingNote = (): ThunkAction<
   void,
   RootState,
   unknown,
-  PayloadAction<{ id?: string }>
+  PayloadAction<{ id?: string } | { errorMessage: string }>
 > => {
   return async (dispatch, getState) => {
     const { uid } = getState().auth;
     const { active: activeNote } = getState().journal;
 
+    if (!activeNote || !uid) return;
+
     const docRef = doc(firestore, `users/${uid}/journal/${activeNote?.id}`).withConverter(
       noteConverter
     );
+
+    const fileDeletePromises: Promise<void>[] = [];
+
+    for (const url of activeNote.imagesUrls) {
+      fileDeletePromises.push(fileDelete(url.name, uid));
+    }
+
+    try {
+      await Promise.all(fileDeletePromises);
+    } catch (error) {
+      if (error instanceof StorageError) {
+        console.error(error);
+        const errorMessage = error.message;
+        return dispatch(setError({ errorMessage }));
+      }
+    }
 
     await deleteDoc(docRef);
 

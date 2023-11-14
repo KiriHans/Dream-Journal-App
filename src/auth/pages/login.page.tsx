@@ -9,9 +9,10 @@ import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
 import { startGoogleSignIn, startLoginUserWithEmailPassword } from 'src/store/auth';
 import { emailValidator, minimumLengthValidator } from 'src/utilities/validators';
 import { CheckingAuth } from 'src/UI/components';
+import { selectAuth } from 'src/store/journal';
 
 export const LoginPage = () => {
-  const { status, error } = useAppSelector((state) => state.auth);
+  const { status, error } = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
   const formLogin: IFormLogin = {
     email: 'example@example',

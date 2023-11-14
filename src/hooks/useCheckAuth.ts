@@ -3,10 +3,10 @@ import { fbAuth } from 'src/firebase/config';
 import { login } from 'src/store/auth';
 import { useAppSelector, useAppDispatch } from './useAppDispatch';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { startLoadingNotes } from 'src/store/journal';
+import { selectAuth, startLoadingNotes } from 'src/store/journal';
 
 export const useCheckAuth = () => {
-  const { status } = useAppSelector((state) => state.auth);
+  const { status } = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
   const onUserChanged = async (user: User | null) => {
     if (!user) {

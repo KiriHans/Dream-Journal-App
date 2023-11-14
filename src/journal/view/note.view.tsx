@@ -7,6 +7,8 @@ import { IFormValidation, useForm } from 'src/hooks';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
 import { IActive } from 'src/store/interfaces';
 import {
+  selectJournal,
+  selectSizeActiveImages,
   setActiveNote,
   startDeletingNote,
   startSaveNote,
@@ -17,7 +19,8 @@ import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 export const NoteView = () => {
-  const { active: note, messageSaved, isSaving } = useAppSelector((state) => state.journal);
+  const { active: note, messageSaved, isSaving } = useAppSelector(selectJournal);
+  const numberActiveImages = useAppSelector(selectSizeActiveImages) || 0;
   const dispatch = useAppDispatch();
   const MySwal = withReactContent(Swal);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -31,12 +34,7 @@ export const NoteView = () => {
 
   const formValidations: IFormValidation = {
     title: [notEmpty, 'Title is empty'],
-    body: [
-      (value: string) => {
-        return maximumLengthValidator(10000)(value) && notEmpty(value);
-      },
-      'Body is invalid',
-    ],
+    body: [maximumLengthValidator(10000), 'Body is too long'],
   };
 
   const {
@@ -50,11 +48,19 @@ export const NoteView = () => {
   } = useForm(
     {
       body: activeNote.body,
-      date: new Date(activeNote.date).toUTCString(),
+      date: new Date(activeNote.date).toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
       title: activeNote.title,
     },
     formValidations
   );
+  Timestamp.toString;
   const { checkedValidation, isFormValid } = validations;
 
   useEffect(() => {
@@ -119,12 +125,13 @@ export const NoteView = () => {
           ref={fileInputRef}
           type="file"
           multiple
+          accept="image/*"
           onChange={onFileInputChange}
           style={{ display: 'none' }}
         />
         <IconButton
           color="primary"
-          disabled={isSaving || !isFormValid}
+          disabled={isSaving || !isFormValid || numberActiveImages >= 10}
           onClick={() => fileInputRef.current?.click()}
         >
           <UploadOutlined />
@@ -170,11 +177,18 @@ export const NoteView = () => {
         />
       </Grid>
 
-      <Grid container justifyContent="end">
-        <Button onClick={onDeleteNote} sx={{ mt: 2 }} color="error">
-          <DeleteOutline />
-          Delete
-        </Button>
+      <Grid container justifyContent="space-between">
+        <Grid item>
+          <Typography fontSize={15} sx={{ mt: 2 }} fontWeight="light" textTransform="capitalize">
+            Max. 10 images.
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Button onClick={onDeleteNote} sx={{ mt: 2 }} color="error">
+            <DeleteOutline />
+            Delete
+          </Button>
+        </Grid>
       </Grid>
 
       <ImageGallery images={activeNote.imagesUrls} />

@@ -7,13 +7,14 @@ import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
 import { ChangeEvent, useMemo, useState } from 'react';
 import { emailValidator, minimumLengthValidator } from 'src/utilities/validators';
 import { startRegisterUserWithEmailPassword } from 'src/store/auth';
+import { selectAuth } from 'src/store/journal';
 
 export interface Test {
   [key: string]: string;
 }
 
 export const RegisterPage = () => {
-  const { status, error } = useAppSelector((state) => state.auth);
+  const { status, error } = useAppSelector(selectAuth);
   const isCheckingAuth = useMemo(() => status === 'checking', [status]);
 
   const dispatch = useAppDispatch();
