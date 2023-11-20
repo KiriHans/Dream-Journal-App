@@ -1,9 +1,9 @@
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import { fbStorage } from 'src/firebase/config';
 
-export const fileUpload = async (file: File, userId: string) => {
+export const fileUpload = async (file: File, noteId: string | undefined, userId: string) => {
   // Upload file
-  const imagesRef = ref(fbStorage, `images/${userId}/${file.name}`);
+  const imagesRef = ref(fbStorage, `images/${userId}/${noteId || 'common'}/${file.name}`);
   const uploadTask = uploadBytesResumable(imagesRef, file);
 
   return uploadTask;

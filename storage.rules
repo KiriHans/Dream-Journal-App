@@ -7,7 +7,7 @@ service firebase.storage {
   match /b/{bucket}/o {
 
 
-    match /images/{userId} {
+    match /images/{userId}/{noteId} {
       allow read: if belongsTo(userId);
       allow delete: if isLoggedIn() && belongsTo(userId);
 

@@ -2,12 +2,8 @@
   box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
   
 }
-.card{
-  view-transition-name: card;
-}
-
-.navbar{
-  view-transition-name: navbar;
+.swal2-container{
+  z-index: 2000;
 }
 
 

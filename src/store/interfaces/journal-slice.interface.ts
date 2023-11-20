@@ -16,7 +16,6 @@ export interface INote {
 
 export interface IJournalSliceState {
   isSaving: boolean;
-  messageSaved: string;
   notes: INote[];
   active: IActive | null;
   error: null | string;

@@ -2,16 +2,25 @@ import { IconButton } from '@mui/material';
 import { JournalLayout } from '../layout/journal.layout';
 import { AddOutlined } from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
-import { selectJournal, startNewNote } from 'src/store/journal';
+import { selectJournal, selectNoteById, setActiveNote, startNewNote } from 'src/store/journal';
 import withReactContent from 'sweetalert2-react-content';
 import Swal from 'sweetalert2';
-import { NoteView, NothingSelectedView } from '../view';
 import { useEffect } from 'react';
+import { Outlet, useParams } from 'react-router-dom';
 
 export const JournalPage = () => {
   const dispatch = useAppDispatch();
-  const { isSaving, active, error } = useAppSelector(selectJournal);
+  const { isSaving, error } = useAppSelector(selectJournal);
   const MySwal = withReactContent(Swal);
+
+  const { id } = useParams();
+  const noteFromId = useAppSelector(selectNoteById(id));
+
+  useEffect(() => {
+    if (noteFromId) {
+      dispatch(setActiveNote(noteFromId));
+    }
+  }, [noteFromId]);
 
   const onClickNewNote = () => {
     if (isSaving) return;
@@ -41,7 +50,8 @@ export const JournalPage = () => {
 
   return (
     <JournalLayout>
-      {active ? <NoteView /> : <NothingSelectedView />}
+      <Outlet />
+
       <IconButton
         disabled={isSaving}
         onClick={onClickNewNote}

@@ -1,10 +1,11 @@
 import { PayloadAction, ThunkAction } from '@reduxjs/toolkit';
 import { RootState } from '..';
-import { IActive, IImagesUrls, INote } from '../interfaces';
+import { IActive, IImagesUrls, IMessage, INote } from '../interfaces';
 import { Timestamp, addDoc, collection, deleteDoc, doc, setDoc } from 'firebase/firestore';
 import { firestore } from 'src/firebase/config';
 import {
   addNewEmptyNote,
+  deleteImageByTitle,
   deleteNoteById,
   savingNewNote,
   setActiveNote,
@@ -18,6 +19,7 @@ import { noteConverter } from 'src/firebase/converters';
 import { fileDelete, fileUpload, loadNotes } from 'src/helpers';
 import { StorageError, UploadTaskSnapshot, getDownloadURL } from 'firebase/storage';
 import { FirebaseError } from 'firebase/app';
+import { setMessage } from '../UI/UI-slice';
 
 export const startNewNote = ({
   title,
@@ -76,11 +78,12 @@ export const startSaveNote = (): ThunkAction<
   void,
   RootState,
   unknown,
-  PayloadAction<void | IActive | { errorMessage: string } | null>
+  PayloadAction<void | IActive | { errorMessage: string } | { message: IMessage | null } | null>
 > => {
   return async (dispatch, getState) => {
     const { uid } = getState().auth;
     const { active: activeNote } = getState().journal;
+    const { message: message } = getState().UI;
     if (!activeNote) return;
 
     dispatch(setSaving());
@@ -99,8 +102,16 @@ export const startSaveNote = (): ThunkAction<
         return dispatch(setError({ errorMessage }));
       }
     }
-
     dispatch(updateNote(updatedNote));
+    if (!message)
+      dispatch(
+        setMessage({
+          message: {
+            title: 'Note saved',
+            body: `${updatedNote.title} updated!`,
+          },
+        })
+      );
   };
 };
 
@@ -128,7 +139,7 @@ export const startUploadingFiles = (
     }
 
     for (const file of files) {
-      fileUploadPromises.push(fileUpload(file, uid));
+      fileUploadPromises.push(fileUpload(file, active.id, uid));
     }
 
     try {
@@ -183,7 +194,7 @@ export const startDeletingNote = (): ThunkAction<
     const fileDeletePromises: Promise<void>[] = [];
 
     for (const url of activeNote.imagesUrls) {
-      fileDeletePromises.push(fileDelete(url.name, uid));
+      fileDeletePromises.push(fileDelete(url.name, activeNote.id, uid));
     }
 
     try {
@@ -199,5 +210,44 @@ export const startDeletingNote = (): ThunkAction<
     await deleteDoc(docRef);
 
     dispatch(deleteNoteById({ id: activeNote?.id }));
+  };
+};
+
+export const startDeletingImage = (
+  titleImage: string
+): ThunkAction<
+  void,
+  RootState,
+  unknown,
+  PayloadAction<{ title: string } | { errorMessage: string } | { message: IMessage | null }>
+> => {
+  return async (dispatch, getState) => {
+    const { uid } = getState().auth;
+    const { active: activeNote } = getState().journal;
+    const { message: message } = getState().UI;
+
+    if (!activeNote || !uid) return;
+
+    try {
+      await fileDelete(titleImage, activeNote.id, uid);
+    } catch (error) {
+      if (error instanceof StorageError) {
+        console.error(error);
+        const errorMessage = error.message;
+        return dispatch(setError({ errorMessage }));
+      }
+    }
+
+    dispatch(deleteImageByTitle({ title: titleImage }));
+    if (!message)
+      dispatch(
+        setMessage({
+          message: {
+            title: `Deleted!`,
+            body: `Image Deleted`,
+          },
+        })
+      );
+    dispatch(startSaveNote());
   };
 };
