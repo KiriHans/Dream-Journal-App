@@ -1,6 +1,6 @@
 import { FirebaseOptions, initializeApp } from 'firebase/app';
 
-import { getAnalytics } from 'firebase/analytics';
+import { getAnalytics, logEvent } from 'firebase/analytics';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
@@ -35,5 +35,8 @@ if (isDev) {
   connectStorageEmulator(fbStorage, '127.0.0.1', 9199);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const analytics = isDev ? null : getAnalytics(fbApp);
+if (analytics) {
+  logEvent(analytics, 'notification_received');
+  logEvent(analytics, 'login', { method: 'Google' });
+}
