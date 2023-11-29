@@ -50,8 +50,9 @@ export const RegisterPage = () => {
   return (
     <AuthLayout title="Sign Up">
       <form
+        name="Login Page Form"
         onSubmit={onSubmit}
-        className="normality animate__animated animate__fadeIn animate__faster"
+        className="animate__animated animate__fadeIn animate__faster"
       >
         <Grid container>
           <Grid
@@ -98,7 +99,7 @@ export const RegisterPage = () => {
               type="password"
               control={control}
               rules={{
-                required: 'Email is required',
+                required: 'Password is required',
                 minLength: {
                   value: 6,
                   message: 'Password is too short',

@@ -45,9 +45,9 @@ export const LoginPage = () => {
   return (
     <AuthLayout title="Login">
       <form
-        action=""
+        name="Login Page Form"
         onSubmit={onSubmit}
-        className="normality animate__animated animate__fadeIn animate__faster"
+        className="animate__animated animate__fadeIn animate__faster"
         autoComplete="on"
       >
         <Grid container>
@@ -100,7 +100,7 @@ export const LoginPage = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Button
-                    disabled={isAuthenticating || !isValid || !isDirty}
+                    disabled={isAuthenticating}
                     onClick={onGoogleSignIn}
                     variant="contained"
                     fullWidth

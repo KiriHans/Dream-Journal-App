@@ -17,6 +17,8 @@ jobs:
         run: yarn
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
+      - name: Create Auth folder
+        run: mkdir -p playwright/.auth
       - name: Run Playwright tests
         run: yarn playwright test
       - uses: actions/upload-artifact@v3

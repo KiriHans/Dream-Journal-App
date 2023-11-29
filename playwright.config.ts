@@ -1,9 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
-
+// import 'dotenv/config';
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 // require('dotenv').config();
 
 /**
@@ -70,8 +71,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev:emulation',
+    command: 'npm run dev',
     url: 'http://127.0.0.1:5173/',
+    timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
   },
 });
