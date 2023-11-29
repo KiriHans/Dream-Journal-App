@@ -12,25 +12,15 @@ const locationHostname = function (hostname: string): { isDev: boolean; hostname
 
 const { isDev, hostname } = locationHostname(location.hostname);
 console.log(import.meta.env.API_KEY);
-const firebaseConfig: FirebaseOptions = isDev
-  ? {
-      apiKey: import.meta.env.VITE_API_KEY,
-      authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-      projectId: import.meta.env.VITE_PROJECT_ID,
-      storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-      messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-      appId: import.meta.env.VITE_APP_ID,
-      measurementId: import.meta.env.VITE_MEASUREMENT_ID,
-    }
-  : {
-      apiKey: 'AIzaSyBadHKqQlE6PgNs1n7XJaVP9oRONpc4Z50',
-      authDomain: 'dream-journal-b5dda.firebaseapp.com',
-      projectId: 'dream-journal-b5dda',
-      storageBucket: 'dream-journal-b5dda.appspot.com',
-      messagingSenderId: '460040744435',
-      appId: '1:460040744435:web:4ad15a0186abd266333686',
-      measurementId: 'G-JCZ5W1F68F',
-    };
+const firebaseConfig: FirebaseOptions = {
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID,
+  measurementId: import.meta.env.VITE_MEASUREMENT_ID,
+};
 
 // Initialize Firebase
 
