@@ -9,7 +9,6 @@ export const useCheckAuth = () => {
   const { status } = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
   const onUserChanged = async (user: User | null) => {
-    console.log(user, 'user');
     if (!user) {
       return;
     }

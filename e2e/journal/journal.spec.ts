@@ -1,16 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { teardown } from '../helper';
-import { RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import firebase from 'firebase/compat/app';
-import { loadEnv } from 'vite';
-import { USER } from '../auth.setup';
 
 test.describe('Journal Page', () => {
-  let testEnv: RulesTestEnvironment, firebase: firebase.firestore.Firestore;
-  const user = { ...USER };
+  const user = {
+    displayName: 'Test subject',
+    email: '123@123.com',
+    password: 'Test123456',
+    id: 'test',
+  };
 
   test.beforeAll(async ({ request }) => {
-    process.env = { ...process.env, ...loadEnv('', process.cwd()) };
     await request.post(
       'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
       {
@@ -18,7 +16,7 @@ test.describe('Journal Page', () => {
           Authorization: 'Bearer owner',
         },
         data: {
-          ...USER,
+          ...user,
         },
       }
     );
@@ -59,13 +57,13 @@ test.describe('Journal Page', () => {
     await expect(page.getByRole('button', { name: 'New Test Title' })).toBeVisible();
   });
 
-  test.afterEach(async () => {
-    firebase.clearPersistence();
-    testEnv.clearFirestore();
+  test.afterEach(async ({ request }) => {
+    request.delete(
+      'http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/databases/(default)/documents'
+    );
   });
 
   test.afterAll(async ({ request }) => {
     request.delete('http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/accounts');
-    await teardown(testEnv);
   });
 });
