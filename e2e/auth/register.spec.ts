@@ -146,6 +146,6 @@ test.describe('Register Page', () => {
   });
 
   test.afterAll(async ({ request }) => {
-    request.delete('http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/accounts');
+    await request.delete('http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/accounts');
   });
 });

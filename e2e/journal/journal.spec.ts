@@ -58,12 +58,12 @@ test.describe('Journal Page', () => {
   });
 
   test.afterEach(async ({ request }) => {
-    request.delete(
+    await request.delete(
       'http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/databases/(default)/documents'
     );
   });
 
   test.afterAll(async ({ request }) => {
-    request.delete('http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/accounts');
+    await request.delete('http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/accounts');
   });
 });

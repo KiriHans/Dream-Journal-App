@@ -8,7 +8,7 @@ test.describe('Login page', () => {
   };
 
   test.beforeAll(async ({ request }) => {
-    request.post(
+    await request.post(
       'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
       {
         headers: {
