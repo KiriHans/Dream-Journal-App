@@ -1,7 +1,7 @@
 import { CircularProgress, Grid } from '@mui/material';
 
 type CheckingAuthProps = {
-  withBackground: boolean;
+  withBackground?: boolean;
   minHeight?: string;
 };
 

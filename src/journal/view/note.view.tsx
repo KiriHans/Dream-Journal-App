@@ -1,24 +1,29 @@
 import { DeleteOutline, SaveOutlined, UploadOutlined } from '@mui/icons-material';
-import { Button, Grid, IconButton, TextField, Typography } from '@mui/material';
+import { Button, Grid, IconButton, Skeleton, Typography } from '@mui/material';
 import { Timestamp } from 'firebase/firestore';
-import { ChangeEventHandler, useEffect, useRef } from 'react';
-import { ImageGallery } from 'src/UI/components';
-import { IFormValidation, useForm } from 'src/hooks';
+import { ChangeEventHandler, useEffect, useMemo, useRef } from 'react';
+import { useForm } from 'react-hook-form';
+import { FormInputText, ImageGallery } from 'src/UI/components';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
+import { selectUI, setMessage } from 'src/store/UI/UI-slice';
 import { IActive } from 'src/store/interfaces';
 import {
+  selectJournal,
+  selectSizeActiveImages,
   setActiveNote,
   startDeletingNote,
   startSaveNote,
   startUploadingFiles,
 } from 'src/store/journal';
-import { maximumLengthValidator, notEmpty } from 'src/utilities/validators';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 
 export const NoteView = () => {
-  const { active: note, messageSaved, isSaving } = useAppSelector((state) => state.journal);
+  const { active: note, isSaving } = useAppSelector(selectJournal);
+  const { message } = useAppSelector(selectUI);
+  const numberActiveImages = useAppSelector(selectSizeActiveImages) || 0;
   const dispatch = useAppDispatch();
+
   const MySwal = withReactContent(Swal);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const activeNote = note ?? {
@@ -29,48 +34,40 @@ export const NoteView = () => {
     imagesUrls: [],
   };
 
-  const formValidations: IFormValidation = {
-    title: [notEmpty, 'Title is empty'],
-    body: [
-      (value: string) => {
-        return maximumLengthValidator(10000)(value) && notEmpty(value);
-      },
-      'Body is invalid',
-    ],
+  const defaultValues = {
+    body: activeNote.body,
+    date: new Date(activeNote.date).toLocaleString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+    title: activeNote.title,
   };
+  const { formState, control, watch } = useForm({
+    defaultValues: defaultValues,
+    values: defaultValues,
+  });
 
-  const {
-    body: bodyNote,
-    date: dateNote,
-    title: titleNote,
-    formState,
-    validations,
-    onInputChange,
-    onResetForm,
-  } = useForm(
-    {
-      body: activeNote.body,
-      date: new Date(activeNote.date).toUTCString(),
-      title: activeNote.title,
-    },
-    formValidations
-  );
-  const { checkedValidation, isFormValid } = validations;
+  const { isValid } = formState;
+
+  const { date, body, title } = watch();
+
+  const isLoading = useMemo(() => title.length === 0, [title]);
 
   useEffect(() => {
-    onResetForm();
-  }, [note]);
-
-  useEffect(() => {
-    const newActiveNote: IActive = { ...activeNote, ...formState, date: activeNote.date };
+    const newActiveNote: IActive = { ...activeNote, date: activeNote.date, body, title };
     dispatch(setActiveNote(newActiveNote));
-  }, [bodyNote, dateNote, titleNote]);
+  }, [body, title]);
 
   useEffect(() => {
-    if (messageSaved.length > 0) {
-      MySwal.fire('Note saved', messageSaved, 'success');
+    if (message) {
+      MySwal.fire(message.title, message.body, 'success');
+      dispatch(setMessage({ message: null }));
     }
-  }, [messageSaved]);
+  }, [message]);
 
   const onSaveNote = () => {
     dispatch(startSaveNote());
@@ -88,7 +85,6 @@ export const NoteView = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         dispatch(startDeletingNote());
-        Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
       }
     });
   };
@@ -98,7 +94,6 @@ export const NoteView = () => {
       dispatch(startUploadingFiles(target.files));
     }
   };
-
   return (
     <Grid
       container
@@ -108,23 +103,30 @@ export const NoteView = () => {
       alignItems="center"
       sx={{ mb: 1 }}
     >
-      <Grid item>
-        <Typography fontSize={39} fontWeight="light">
-          {dateNote}
+      {isLoading ? (
+        <Typography fontSize={39} width="100%" fontWeight="light" variant="h2">
+          <Skeleton height={49} width="100%" />
         </Typography>
-      </Grid>
+      ) : (
+        <Grid item>
+          <Typography fontSize={39} fontWeight="light" variant="h2">
+            {date}
+          </Typography>
+        </Grid>
+      )}
 
       <Grid item>
         <input
           ref={fileInputRef}
           type="file"
           multiple
+          accept="image/*"
           onChange={onFileInputChange}
           style={{ display: 'none' }}
         />
         <IconButton
           color="primary"
-          disabled={isSaving || !isFormValid}
+          disabled={isSaving || !isValid || numberActiveImages >= 10}
           onClick={() => fileInputRef.current?.click()}
         >
           <UploadOutlined />
@@ -132,7 +134,7 @@ export const NoteView = () => {
         <Button
           color="primary"
           sx={{ padding: 2 }}
-          disabled={isSaving || !isFormValid}
+          disabled={isSaving || !isValid}
           onClick={onSaveNote}
         >
           <SaveOutlined sx={{ fontSize: 30, mr: 1 }} />
@@ -141,40 +143,44 @@ export const NoteView = () => {
       </Grid>
 
       <Grid container>
-        <TextField
-          type="text"
-          variant="filled"
-          fullWidth
-          placeholder="Write your title"
-          label="Title"
-          sx={{ border: 'none', mb: 1 }}
+        <FormInputText
           name="title"
-          error={!!checkedValidation[`titleValid`]}
-          helperText={checkedValidation[`titleValid`]}
-          value={titleNote}
-          onChange={onInputChange}
-        />
-        <TextField
+          label="Title"
           type="text"
-          variant="filled"
-          fullWidth
+          control={control}
+          sx={{ border: 'none', mb: 1 }}
+          rules={{
+            required: 'Title is empty',
+          }}
+        />
+
+        <FormInputText
+          name="body"
+          label="Write your dream..."
+          type="text"
+          control={control}
+          placeholder="Write your dream..."
           multiline
           aria-multiline
-          placeholder="Write your dream..."
           minRows={5}
-          name="body"
-          error={!!checkedValidation[`bodyValid`]}
-          helperText={checkedValidation[`bodyValid`]}
-          value={bodyNote}
-          onChange={onInputChange}
+          rules={{
+            required: 'Title is empty',
+          }}
         />
       </Grid>
 
-      <Grid container justifyContent="end">
-        <Button onClick={onDeleteNote} sx={{ mt: 2 }} color="error">
-          <DeleteOutline />
-          Delete
-        </Button>
+      <Grid container justifyContent="space-between">
+        <Grid item>
+          <Typography fontSize={15} sx={{ mt: 2 }} fontWeight="light" textTransform="capitalize">
+            Max. 10 images (Less than 1Mb each)
+          </Typography>
+        </Grid>
+        <Grid item>
+          <Button onClick={onDeleteNote} sx={{ mt: 2 }} color="error">
+            <DeleteOutline />
+            Delete
+          </Button>
+        </Grid>
       </Grid>
 
       <ImageGallery images={activeNote.imagesUrls} />

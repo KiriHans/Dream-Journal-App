@@ -1,14 +1,15 @@
-import { Box, Divider, Drawer, List, Toolbar, Typography } from '@mui/material';
+import { Box, Divider, List, Toolbar, Typography } from '@mui/material';
 import { useAppSelector } from 'src/hooks/useAppDispatch';
-import { SidebarItem } from '.';
+import { ResponsiveDrawer, SidebarItem } from '.';
+import { SelectNotesSorted, selectAuth } from 'src/store/journal';
 
 type SideBarProps = {
   drawerWidth: number;
 };
 
 export const SideBar = ({ drawerWidth }: SideBarProps) => {
-  const { displayName } = useAppSelector((state) => state.auth);
-  const { notes } = useAppSelector((state) => state.journal);
+  const { displayName } = useAppSelector(selectAuth);
+  const notes = useAppSelector(SelectNotesSorted);
 
   return (
     <Box
@@ -18,14 +19,7 @@ export const SideBar = ({ drawerWidth }: SideBarProps) => {
         flexShrink: { sm: 0 },
       }}
     >
-      <Drawer
-        variant="permanent"
-        open
-        sx={{
-          'display': { xs: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
-      >
+      <ResponsiveDrawer drawerWidth={drawerWidth}>
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
             {displayName}
@@ -39,7 +33,7 @@ export const SideBar = ({ drawerWidth }: SideBarProps) => {
             <SidebarItem key={note.id} note={note} />
           ))}
         </List>
-      </Drawer>
+      </ResponsiveDrawer>
     </Box>
   );
 };

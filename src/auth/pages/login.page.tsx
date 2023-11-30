@@ -1,41 +1,43 @@
 import { Google } from '@mui/icons-material';
-import { Button, Grid, TextField, Typography, Link, Alert } from '@mui/material';
+import { Button, Grid, Typography, Link, Alert } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { AuthLayout } from '../layout/auth.layout';
 import { IFormLogin } from '../interfaces';
-import { IFormValidation, useForm } from 'src/hooks';
-import { ChangeEvent, useMemo } from 'react';
+import { useForm } from 'react-hook-form';
+import { useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
 import { startGoogleSignIn, startLoginUserWithEmailPassword } from 'src/store/auth';
-import { emailValidator, minimumLengthValidator } from 'src/utilities/validators';
 import { CheckingAuth } from 'src/UI/components';
+import { selectAuth } from 'src/store/journal';
+import { FormInputText } from 'src/UI/components';
+import { emailValidator } from 'src/utilities/validators';
 
 export const LoginPage = () => {
-  const { status, error } = useAppSelector((state) => state.auth);
+  const { status, error } = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
-  const formLogin: IFormLogin = {
-    email: 'example@example',
-    password: 'Password',
-  };
-  const formValidations: IFormValidation = {
-    email: [emailValidator, 'Email is invalid'],
-    password: [minimumLengthValidator(6), 'Password is invalid'],
+  const defaultValues: IFormLogin = {
+    email: '',
+    password: '',
   };
 
-  const { email, password, validations, onInputChange } = useForm(formLogin, formValidations);
-  const { isFormValid, checkedValidation } = validations;
+  const { handleSubmit, control, formState } = useForm<IFormLogin>({
+    defaultValues: defaultValues,
+    mode: 'onTouched',
+  });
+
+  const { isDirty, isValid } = formState;
 
   const isAuthenticating = useMemo(() => status === 'checking', [status]);
 
-  const onSubmit = (event: ChangeEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (isAuthenticating || !isFormValid) return;
+  const onSubmit = handleSubmit((data) => {
+    const { email, password } = data;
+    if (isAuthenticating || !isValid) return;
 
     dispatch(startLoginUserWithEmailPassword({ email, password }));
-  };
+  });
 
   const onGoogleSignIn = () => {
-    if (isAuthenticating || !isFormValid) return;
+    if (isAuthenticating || !isValid) return;
 
     dispatch(startGoogleSignIn());
   };
@@ -43,9 +45,9 @@ export const LoginPage = () => {
   return (
     <AuthLayout title="Login">
       <form
-        action=""
+        name="Login Page Form"
         onSubmit={onSubmit}
-        className="normality animate__animated animate__fadeIn animate__faster"
+        className="animate__animated animate__fadeIn animate__faster"
         autoComplete="on"
       >
         <Grid container>
@@ -53,33 +55,32 @@ export const LoginPage = () => {
             <CheckingAuth withBackground={false} minHeight="20vh" />
           ) : (
             <>
-              <Grid item xs={12} sx={{ mt: 2 }}>
-                <TextField
-                  label="Email"
+              <Grid item xs={12}>
+                <FormInputText
                   name="email"
-                  type="email"
-                  onChange={onInputChange}
-                  placeholder={formLogin.email}
-                  value={email}
-                  error={!!checkedValidation[`emailValid`]}
-                  helperText={checkedValidation[`emailValid`]}
-                  required
-                  fullWidth
+                  label="Email"
+                  type="Email"
+                  control={control}
+                  rules={{
+                    required: 'Email is required',
+                    validate: (value: string) => emailValidator(value) || 'Email is invalid',
+                  }}
                 />
               </Grid>
 
               <Grid item xs={12} sx={{ mt: 2 }}>
-                <TextField
-                  label="Password"
+                <FormInputText
                   name="password"
+                  label="Password"
                   type="password"
-                  onChange={onInputChange}
-                  placeholder={formLogin.password}
-                  value={password}
-                  error={!!checkedValidation[`passwordValid`]}
-                  helperText={checkedValidation[`passwordValid`]}
-                  required
-                  fullWidth
+                  control={control}
+                  rules={{
+                    required: 'Password is required',
+                    minLength: {
+                      value: 6,
+                      message: 'Password is too short',
+                    },
+                  }}
                 />
               </Grid>
 
@@ -89,7 +90,7 @@ export const LoginPage = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Button
-                    disabled={isAuthenticating || !isFormValid}
+                    disabled={isAuthenticating || !isValid || !isDirty}
                     type="submit"
                     variant="contained"
                     fullWidth
@@ -99,7 +100,7 @@ export const LoginPage = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Button
-                    disabled={isAuthenticating || !isFormValid}
+                    disabled={isAuthenticating}
                     onClick={onGoogleSignIn}
                     variant="contained"
                     fullWidth

@@ -9,8 +9,7 @@ service cloud.firestore {
 
       match /journal/{noteId} {
         allow read: if belongsTo(userId);
-        allow create: if canCreateNote(userId);
-
+        allow create, update: if canCreateNote(userId);
         allow delete: if belongsTo(userId);
       }
     }
@@ -24,20 +23,23 @@ service cloud.firestore {
     }
 
     function canCreateNote(userId) {
+
       let isSignedIn = request.auth.uid != null;
       let isOwner = request.auth.uid == userId;
 
       let isTitleString = request.resource.data.title is string;
-      let isTitleNotTooShort = request.resource.data.title > 0;
+      let isTitleNotTooShort = request.resource.data.title.size() > 0;
 
       let isBodyString = request.resource.data.body is string;
-      let isBodyNotTooShort = request.resource.data.title > 0;
       let isBodyNotTooLong = request.resource.data.body.size() <= 10000;
 
       let isImagesUrls = request.resource.data.imagesUrls is list;
+
       let isDoesNotHaveTooMuchImages = request.resource.data.imagesUrls.size() <= 10;
 
-      return isSignedIn && isOwner && isTitleString && isTitleNotTooShort && isBodyString && isBodyNotTooShort && isBodyNotTooLong && isImagesUrls && isDoesNotHaveTooMuchImages;
+      let isDateTimestamp = request.resource.data.date is timestamp;
+
+      return isSignedIn && isOwner && isTitleString && isTitleNotTooShort && isBodyString  && isBodyNotTooLong && isImagesUrls  && isDoesNotHaveTooMuchImages && isDateTimestamp;
     }
   }
 }

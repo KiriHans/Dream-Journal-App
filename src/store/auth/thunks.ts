@@ -9,6 +9,7 @@ import {
 } from 'src/firebase/providers';
 import { ResultSignInGoogle } from 'src/firebase/interfaces';
 import { IFormLogin, IFormRegister } from 'src/auth/interfaces';
+import { clearNotes } from '../journal';
 
 export const checkingAuthentication = (
   email: string,
@@ -34,7 +35,6 @@ export const startGoogleSignIn = (): ThunkAction<
 
     const result = await signInWithGoogle();
     if (!result.ok) {
-      console.log('asds');
       const errorMessage = result.errorMessage;
       return dispatch(logout({ errorMessage }));
     }
@@ -94,11 +94,12 @@ export const startLogout = (): ThunkAction<
   void,
   RootState,
   unknown,
-  PayloadAction<{ errorMessage?: string }>
+  PayloadAction<{ errorMessage?: string } | void>
 > => {
   return async (dispatch) => {
     await logoutFirebase();
 
     dispatch(logout({}));
+    dispatch(clearNotes());
   };
 };

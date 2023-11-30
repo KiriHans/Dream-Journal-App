@@ -1,14 +1,28 @@
-import { LogoutOutlined, MenuOutlined } from '@mui/icons-material';
-import { AppBar, Grid, IconButton, Toolbar, Typography } from '@mui/material';
-import { useAppDispatch } from 'src/hooks/useAppDispatch';
+import { HomeOutlined, LogoutOutlined, MenuOutlined } from '@mui/icons-material';
+import { AppBar, Grid, IconButton, Stack, Toolbar, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'src/hooks/useAppDispatch';
+import { selectUI, setMobileOpen } from 'src/store/UI/UI-slice';
 import { startLogout } from 'src/store/auth';
+import { clearActiveNote } from 'src/store/journal';
 
 type NavBarProps = {
   drawerWidth: number;
 };
 
 export const NavBar = ({ drawerWidth = 240 }: NavBarProps) => {
+  const { isMobileOpen } = useAppSelector(selectUI);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleDrawerToggle = () => {
+    dispatch(setMobileOpen(!isMobileOpen));
+  };
+
+  const onNothingView = () => {
+    dispatch(clearActiveNote());
+    navigate('/journal');
+  };
 
   const onLogout = () => {
     dispatch(startLogout());
@@ -26,7 +40,12 @@ export const NavBar = ({ drawerWidth = 240 }: NavBarProps) => {
       }}
     >
       <Toolbar>
-        <IconButton color="inherit" edge="start" sx={{ mr: 2, display: { sm: 'none' } }}>
+        <IconButton
+          onClick={handleDrawerToggle}
+          color="inherit"
+          edge="start"
+          sx={{ mr: 2, display: { sm: 'none' } }}
+        >
           <MenuOutlined />
         </IconButton>
         <Grid container direction="row" justifyContent="space-between" alignItems="center">
@@ -34,10 +53,20 @@ export const NavBar = ({ drawerWidth = 240 }: NavBarProps) => {
             {' '}
             Journal Dream App{' '}
           </Typography>
-
-          <IconButton color="error" onClick={onLogout}>
-            <LogoutOutlined />
-          </IconButton>
+          <Stack
+            spacing={{ xs: 1, sm: 2 }}
+            direction="row"
+            useFlexGap
+            justifyItems="flex-end"
+            flexWrap="wrap"
+          >
+            <IconButton sx={{ color: 'white' }} onClick={onNothingView}>
+              <HomeOutlined />
+            </IconButton>
+            <IconButton color="error" onClick={onLogout}>
+              <LogoutOutlined />
+            </IconButton>
+          </Stack>
         </Grid>
       </Toolbar>
     </AppBar>
