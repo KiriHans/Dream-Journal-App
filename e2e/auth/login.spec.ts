@@ -9,7 +9,7 @@ test.describe('Login page', () => {
 
   test.beforeAll(async ({ request }) => {
     request.post(
-      'http://localhost:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
+      'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
       {
         headers: {
           Authorization: 'Bearer owner',
