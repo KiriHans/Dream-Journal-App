@@ -10,9 +10,11 @@ import {
   savingNewNote,
   setActiveNote,
   setError,
+  setLoading,
   setNotes,
   setPhotosToActiveNote,
   setSaving,
+  stopLoading,
   updateNote,
 } from '.';
 import { noteConverter } from 'src/firebase/converters';
@@ -64,13 +66,15 @@ export const startLoadingNotes = (): ThunkAction<
   void,
   RootState,
   unknown,
-  PayloadAction<INote[]>
+  PayloadAction<INote[] | void>
 > => {
   return async (dispatch, getState) => {
+    dispatch(setLoading());
     const { uid } = getState().auth;
     const notes = await loadNotes(uid);
 
     dispatch(setNotes(notes));
+    dispatch(stopLoading());
   };
 };
 

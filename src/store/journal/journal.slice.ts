@@ -9,6 +9,7 @@ const initialState: IJournalSliceState = {
   notes: [],
   active: null,
   error: null,
+  loading: false,
 };
 
 const journalSlice = createSlice({
@@ -69,6 +70,12 @@ const journalSlice = createSlice({
       state.isSaving = false;
       state.error = payload.errorMessage;
     },
+    setLoading: (state) => {
+      state.loading = true;
+    },
+    stopLoading: (state) => {
+      state.loading = false;
+    },
   },
 });
 
@@ -85,6 +92,8 @@ export const {
   deleteImageByTitle,
   clearNotes,
   setError,
+  setLoading,
+  stopLoading,
 } = journalSlice.actions;
 
 export const journalReducer = journalSlice.reducer;
@@ -93,6 +102,8 @@ export const selectAuth = (state: RootState) => state.auth;
 export const selectJournal = (state: RootState) => state.journal;
 
 export const selectSizeActiveImages = (state: RootState) => state.journal.active?.imagesUrls.length;
+
+export const selectLoadingJournal = (state: RootState) => state.journal.loading;
 
 export const selectNoteById = (id: string | undefined) => {
   return (state: RootState) => {
