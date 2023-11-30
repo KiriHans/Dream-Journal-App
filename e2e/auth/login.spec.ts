@@ -1,10 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { setup, teardown } from '../helper';
-import { RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import firebase from 'firebase/compat/app';
 
 test.describe('Login page', () => {
-  let testEnv: RulesTestEnvironment, firebase: firebase.firestore.Firestore;
   const user = {
     displayName: 'Test subject',
     email: '123@123.com',
@@ -12,9 +8,8 @@ test.describe('Login page', () => {
   };
 
   test.beforeAll(async ({ request }) => {
-    ({ testEnv, firebase } = await setup(null, { withRules: true }));
     request.post(
-      'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
+      'http://localhost:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
       {
         headers: {
           Authorization: 'Bearer owner',
@@ -139,15 +134,5 @@ test.describe('Login page', () => {
       await expect(navMenu).toBeVisible();
       await expect(nameUser).toBeVisible();
     });
-  });
-
-  test.afterEach(async () => {
-    firebase.clearPersistence();
-
-    testEnv.clearFirestore();
-  });
-
-  test.afterAll(async () => {
-    await teardown(testEnv);
   });
 });

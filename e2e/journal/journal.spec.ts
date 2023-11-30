@@ -10,7 +10,7 @@ test.describe('Journal Page', () => {
 
   test.beforeAll(async ({ request }) => {
     await request.post(
-      'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
+      'http://localhost:9099/identitytoolkit.googleapis.com/v1/projects/demo-project-1234/accounts',
       {
         headers: {
           Authorization: 'Bearer owner',
@@ -59,11 +59,11 @@ test.describe('Journal Page', () => {
 
   test.afterEach(async ({ request }) => {
     request.delete(
-      'http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/databases/(default)/documents'
+      'http://localhost:9099/emulator/v1/projects/demo-project-1234/databases/(default)/documents'
     );
   });
 
   test.afterAll(async ({ request }) => {
-    request.delete('http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/accounts');
+    request.delete('http://localhost:9099/emulator/v1/projects/demo-project-1234/accounts');
   });
 });

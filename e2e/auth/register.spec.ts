@@ -1,19 +1,11 @@
 import { expect, test } from '@playwright/test';
-import { setup, teardown } from '../helper';
-import { RulesTestEnvironment } from '@firebase/rules-unit-testing';
-import firebase from 'firebase/compat/app';
 
 test.describe('Register Page', () => {
-  let testEnv: RulesTestEnvironment, firebase: firebase.firestore.Firestore;
   const registerValues = {
     displayName: 'Test Name',
     email: 'test@email.com',
     password: '123456',
   };
-
-  test.beforeAll(async () => {
-    ({ testEnv, firebase } = await setup(null, { withRules: true }));
-  });
 
   test.beforeEach(async ({ page }) => {
     await page.goto('auth/register');
@@ -153,14 +145,7 @@ test.describe('Register Page', () => {
     });
   });
 
-  test.afterEach(async () => {
-    firebase.clearPersistence();
-    testEnv.clearFirestore();
-  });
-
   test.afterAll(async ({ request }) => {
-    request.delete('http://127.0.0.1:9099/emulator/v1/projects/demo-project-1234/accounts');
-
-    await teardown(testEnv);
+    request.delete('http://localhost:9099/emulator/v1/projects/demo-project-1234/accounts');
   });
 });
