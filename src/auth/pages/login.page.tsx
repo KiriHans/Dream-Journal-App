@@ -37,7 +37,7 @@ export const LoginPage = () => {
   });
 
   const onGoogleSignIn = () => {
-    if (isAuthenticating || !isValid) return;
+    if (isAuthenticating) return;
 
     dispatch(startGoogleSignIn());
   };
