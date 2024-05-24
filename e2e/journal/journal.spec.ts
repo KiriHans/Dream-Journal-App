@@ -51,8 +51,8 @@ test.describe('Journal Page', () => {
 
   test('should add new journal when add button is clicked', async ({ page }) => {
     await page.getByRole('main').getByRole('button').click();
-    await page.locator('#swal2-input').fill('New Test Title');
-    await page.getByLabel('Create button').click();
+    await page.getByLabel('Title *').fill('New Test Title');
+    await page.getByRole('button', { name: 'Create!' }).click();
 
     await expect(page.getByRole('button', { name: 'New Test Title' })).toBeVisible();
   });

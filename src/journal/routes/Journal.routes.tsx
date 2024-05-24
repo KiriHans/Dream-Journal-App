@@ -12,7 +12,6 @@ export const JournalRoutes = () => {
 
   useEffect(() => {
     if (active && active.id && active.title) {
-      console.log(`/journal/${active.id}/${active.title}`);
       navigate(`/journal/${active.id}/${active.title}`);
     }
   }, [active?.id, active?.title]);
