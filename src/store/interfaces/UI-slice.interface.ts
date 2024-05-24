@@ -5,6 +5,7 @@ export interface IMessage {
 
 export interface IUISliceState {
   isMobileOpen: boolean;
+  isModalOpen: boolean;
   doesMatchBreakpointSm: boolean;
   message: IMessage | null;
 }

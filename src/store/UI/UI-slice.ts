@@ -5,6 +5,7 @@ import { RootState } from '..';
 const UISliceName = 'UI';
 const initialState: IUISliceState = {
   isMobileOpen: false,
+  isModalOpen: false,
   doesMatchBreakpointSm: false,
   message: null,
 };
@@ -22,10 +23,13 @@ const UISlice = createSlice({
     setMessage: (state, { payload }: PayloadAction<{ message: IMessage | null }>) => {
       state.message = payload.message;
     },
+    setToast: (state, { payload }: PayloadAction<{ isModalOpen: boolean }>) => {
+      state.isModalOpen = payload.isModalOpen;
+    },
   },
 });
 
-export const { setMobileOpen, updateBreakpoint, setMessage } = UISlice.actions;
+export const { setMobileOpen, updateBreakpoint, setMessage, setToast } = UISlice.actions;
 
 export const UIReducer = UISlice.reducer;
 
